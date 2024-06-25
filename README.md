@@ -13,7 +13,7 @@ Welcome to the Personal Note Taking App! This application allows users to regist
 
 ## Live Application
 
-You can access the live application [here](https://personal-note-i42w.onrender.com/). The app is fully deployed and ready for use.
+You can access the live application [here](https://mynote-vv6z.onrender.com/). The app is fully deployed and ready for use.
 
 ## Usage
 
