@@ -1,11 +1,13 @@
 services:
   - type: web
-    name: mern-app
-    env: node
+    name: take-note
+    runtime: node
     plan: free
-    buildCommand: 'npm install'
-    startCommand: 'node app.js'
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run start"
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET

@@ -1,71 +1,78 @@
-# Personal Note Taking App
+# Take-Note
 
-Welcome to the Personal Note Taking App! This application allows users to register, log in, and manage their personal notes in a secure and user-friendly environment.
+A personal note-taking app — **React SPA** frontend + **Express + MongoDB** REST API backend.
 
-## Features
+> Refactor of the original EJS/SSR app. See [`CHANGES.md`](./CHANGES.md) for the full
+> code review, architecture decisions, and a per-step change log.
 
-- **User Registration**: Create an account with your email, name, and password.
-- **User Login**: Authenticate using your email and password.
-- **Create Notes**: Add new notes with a title and content.
-- **View Notes**: Access all your notes from your profile.
-- **Edit Notes**: Update the title and content of your notes.
-- **Delete Notes**: Remove notes you no longer need.
+## Architecture
 
-## Live Application
+```
+take-note/
+├── server/   Express REST API (JWT auth, Mongoose, helmet, cors, validation)
+└── client/   React SPA (Vite, react-router, axios, mobile-first responsive)
+```
 
-You can access the live application [here](https://mynote-vv6z.onrender.com/). The app is fully deployed and ready for use.
+In **production** the Express server also serves the built SPA from `client/dist`,
+so the API and the UI live on a single origin. In **development** the Vite dev
+server proxies `/api/*` to the Express server, so cookies and CORS Just Work.
 
-## Usage
+## REST API
 
-### Register
+| Method | Path                  | Auth | Description |
+|--------|-----------------------|------|-------------|
+| POST   | `/api/auth/register`  | —    | Create account, returns user, sets cookie |
+| POST   | `/api/auth/login`     | —    | Sign in, returns user, sets cookie |
+| POST   | `/api/auth/logout`    | —    | Clears cookie |
+| GET    | `/api/auth/me`        | ✓    | Current user |
+| GET    | `/api/notes`          | ✓    | List your notes |
+| POST   | `/api/notes`          | ✓    | Create a note `{title, content?}` |
+| GET    | `/api/notes/:id`      | ✓    | Get a note |
+| PATCH  | `/api/notes/:id`      | ✓    | Update title and/or content |
+| DELETE | `/api/notes/:id`      | ✓    | Delete a note |
 
-1. Navigate to the registration page.
-2. Fill in your email, name, and password.
-3. Click the register button.
+## Local development
 
-### Login
+```bash
+# 1. Install everything
+npm run install:all     # or: npm install (root devDep), then npm run build
 
-1. Navigate to the login page.
-2. Enter your email and password.
-3. Click the login button.
+# 2. Configure the server env
+cp server/.env.example server/.env
+# edit server/.env — set MONGO_URI and JWT_SECRET to real values
 
-### Create Note
+# 3. Run client + server together
+npm run dev
+# → server on http://localhost:3000
+# → client on http://localhost:5173   (proxies /api to :3000)
+```
 
-1. Once logged in, go to your profile page.
-2. Use the note creation form to add a new note.
+## Environment variables (server)
 
-### View Notes
+| Var             | Required | Default | Notes |
+|-----------------|----------|---------|-------|
+| `MONGO_URI`     | ✓        | —       | MongoDB connection string |
+| `JWT_SECRET`    | ✓        | —       | Long random string |
+| `PORT`          |          | `3000`  | API port |
+| `NODE_ENV`      |          | `development` | `production` enables SPA serving + secure cookies |
+| `CLIENT_ORIGIN` |          | `http://localhost:5173` | CORS origin in dev |
+| `JWT_EXPIRES_IN`|          | `7d`    | Token lifetime |
 
-1. On your profile page, you can see a list of your notes.
-2. Click on a note to view its details.
+## Production build
 
-### Edit Note
+```bash
+NODE_ENV=production npm run build
+NODE_ENV=production npm start
+```
 
-1. On the note detail page, click the edit button.
-2. Update the title and/or content of the note.
-3. Save the changes.
+The build step installs both workspaces and outputs the SPA into
+`client/dist`, which the Express server then serves directly. Render uses
+exactly this flow — see `render.yaml`.
 
-### Delete Note
+## Live application
 
-1. On the note detail page, click the delete button to remove the note.
+Deployed at https://mynote-vv6z.onrender.com/.
 
-## Code Overview
+## Author
 
-### `app.js`
-
-- Sets up the Express application and middleware.
-- Defines routes for registration, login, note management, and profile access.
-- Includes authentication and authorization logic using JSON Web Tokens (JWT).
-
-### `user.js`
-
-- Defines the user schema and model using Mongoose.
-- Establishes a MongoDB connection using environment variables.
-
-### `post.js`
-
-- Defines the post (note) schema and model using Mongoose.
-- Associates posts with user accounts.
----
-
-Thank you for using the Personal Note Taking App! If you have any questions or feedback, please reach out->[LinkedIn](https://www.linkedin.com/in/aakarsh-arora-b3965822b/)
+[Aakarsh Arora](https://www.linkedin.com/in/aakarsh-arora-b3965822b/)
